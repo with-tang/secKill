@@ -1,0 +1,50 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.seckill.dao.SecKillDao">
+    <!-- target:provide sql configuration for DAO interface -->
+    <update id="reduceNumber">
+        <!-- update sql -->
+        UPDATE
+          seckill
+        SET
+          number = number -1
+        WHERE
+          secKillId = #{secKillId}
+        AND
+          start_time <![CDATA[<=]]> #{killTime}
+        AND
+          end_time<![CDATA[>=]]>#{killTime}
+        AND
+          number > 0;
+    </update>
+
+    <select id="queryById" resultType="SecKill" parameterType="long">
+        <!-- query sql --> 
+        SELECT
+          secKillId,name,number,start_time,end_time,create_time
+        FROM
+          seckill
+        WHERE
+          secKillId = #{secKillId};
+                
+    </select>
+
+    <select id="queryAll" resultType="SecKill" parameterType="int">
+      SELECT
+        secKillId,name,number,start_time,end_time,create_time
+      FROM
+        seckill
+      ORDER BY
+        create_time DESC
+      LIMIT #{offset},#{limit};
+    </select>
+    <select id="killByProcedure" statementType="CALLABLE">
+    call seckill_execute(
+          #{secKillId, jdbcType=BIGINT, mode=IN},
+          #{phone, jdbcType=BIGINT, mode=IN},
+          #{killTime, jdbcType=TIMESTAMP, mode=IN},
+          #{result, jdbcType=INTEGER, mode=OUT}
+        )
+    </select>
+</mapper>
